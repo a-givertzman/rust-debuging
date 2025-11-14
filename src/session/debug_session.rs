@@ -89,11 +89,16 @@ impl DebugSession {
             backtrace: Backtrace::Short,
         }
     }
-    /// 
     ///
     /// Default filtering lefel for all events
     pub fn filter(mut self, level: LogLevel) -> Self {
         self.level = level;
+        self
+    }
+    ///
+    /// Filtering lefel for exact module
+    pub fn module(mut self, module: impl Into<String>, level: LogLevel) -> Self {
+        self.modules.push((module.into(), level));
         self
     }
     ///
