@@ -106,6 +106,18 @@ impl DebugSession {
     #[allow(dead_code)]
     pub fn init(self) {
         INIT.call_once(|| {
+            let backtrace = self.backtrace.to_string();
+            env::set_var("RUST_BACKTRACE", &backtrace);
+            match env::var("RUST_BACKTRACE") {
+                Ok(env_backtrace) => {
+                    if env_backtrace != backtrace {
+                        println!("DebugSession.init | Can't set 'RUST_BACKTRACE' = '{backtrace}'")
+                    }
+                }
+                Err(err) => {
+                    println!("DebugSession.init | Can't read 'RUST_BACKTRACE' env, error: {:?}", err)
+                }
+            }
             let filter = Targets::new()
                 .with_default(LevelFilter::DEBUG);
             let filter = self.modules.iter().fold(filter, |filter, (target, level)| {
@@ -116,23 +128,21 @@ impl DebugSession {
                 .with(filter)
                 .init();
 
-            let backtrace = self.backtrace.to_string();
-            env::set_var("RUST_BACKTRACE", &backtrace);
-            assert_eq!(env::var("RUST_BACKTRACE"), Ok(backtrace.clone()), "Set env RUST_BACKTRACE={} failed", backtrace);
+            // assert_eq!(env::var("RUST_BACKTRACE"), Ok(backtrace.clone()), "Set env RUST_BACKTRACE={} failed", backtrace);
             // env::set_var("RUST_LOG_STYLE", log_style);     // auto / always / never
             // assert_eq!(env::var("RUST_LOG_STYLE"), Ok(log_style.to_string()), "Set env RUST_LOG_STYLE={} failed", log_style);
-            match env_logger::builder().is_test(true).try_init() {
-                Ok(_) => {
-                    println!("DebugSession.init | Ok");
-                    println!("DebugSession.init | RUST_LOG = {:?}", env::var("RUST_LOG"));
-                    println!("DebugSession.init | RUST_BACKTRACE = {:?}", env::var("RUST_BACKTRACE"));
-                    println!("DebugSession.init | RUST_LOG_STYLE = {:?}", env::var("RUST_LOG_STYLE"));
-                    println!("");
-                },
-                Err(err) => {
-                    println!("DebugSession.init | error: {:?}", err)
-                },
-            };
+            // match env_logger::builder().is_test(true).try_init() {
+            //     Ok(_) => {
+            //         println!("DebugSession.init | Ok");
+            //         println!("DebugSession.init | RUST_LOG = {:?}", env::var("RUST_LOG"));
+            //         println!("DebugSession.init | RUST_BACKTRACE = {:?}", env::var("RUST_BACKTRACE"));
+            //         println!("DebugSession.init | RUST_LOG_STYLE = {:?}", env::var("RUST_LOG_STYLE"));
+            //         println!("");
+            //     },
+            //     Err(err) => {
+            //         println!("DebugSession.init | error: {:?}", err)
+            //     },
+            // };
         })
     }
 }
