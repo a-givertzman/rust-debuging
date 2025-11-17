@@ -9,6 +9,7 @@ static INIT: Once = Once::new();
 /// Depending on the use case, more or less verbose diagnostics may be desired.
 /// - When running in development, DEBUG-level traces may be enabled by default.
 /// - When running in production, only INFO-level and lower traces might be enabled.
+#[derive(Debug, Clone, Copy)]
 #[allow(dead_code)]
 pub enum LogLevel {
     Off,
