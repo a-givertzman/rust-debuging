@@ -120,7 +120,7 @@ impl DebugSession {
                 }
             }
             let filter = Targets::new()
-                .with_default(LevelFilter::DEBUG);
+                .with_default(self.level);
             let filter = self.modules.iter().fold(filter, |filter, (target, level)| {
                 filter.with_target(target, level)
             });
